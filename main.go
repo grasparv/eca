@@ -23,7 +23,7 @@ type DecryptCmd struct {
 	XFlag      string `xflag:"decrypt|Decrypt a file"`
 	File       string `xflag:"Path to encrypted file"`
 	Passphrase string `xflag:"Secret passphrase"`
-	Remove     *bool  `xflag:"true|Remove source directory on success"`
+	Remove     *bool  `xflag:"true|Remove source file on success"`
 }
 
 func main() {
