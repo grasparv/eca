@@ -37,40 +37,40 @@ func main() {
 
 	logger := makeLogger()
 
-	var name string
-	var target string
+	var dst string
+	var src string
 	var passfile string
 	var fn func(string, string, []byte) error
 
 	switch cmd := cmd.(type) {
 	case *EncryptCmd:
 		fn = encrypt
-		target = cmd.Directory
-		name = strings.TrimSuffix(cmd.Directory, "/") + ".bin"
+		src = cmd.Directory
+		dst = strings.TrimSuffix(cmd.Directory, "/") + ".bin"
 		passfile = cmd.Passfile
 	case *DecryptCmd:
 		fn = decrypt
-		target = cmd.File
-		name = strings.TrimSuffix(filepath.Base(cmd.File), ".bin")
+		src = cmd.File
+		dst = strings.TrimSuffix(filepath.Base(cmd.File), ".bin")
 		passfile = cmd.Passfile
 	default:
 		os.Stderr.WriteString(xflag.GetUsage(commands))
 		os.Exit(1)
 	}
 
-	_, err = os.Stat(target)
+	_, err = os.Stat(src)
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Error("does not exist", "name", target)
+		logger.Error("does not exist", "dst", src)
 		os.Exit(1)
 	}
 
-	_, err = os.Stat(name)
+	_, err = os.Stat(dst)
 	if !errors.Is(err, os.ErrNotExist) {
-		logger.Error("will not overwrite", "name", name)
+		logger.Error("will not overwrite", "dst", dst)
 		os.Exit(1)
 	}
 
-	logger.Info("using", "name", name)
+	logger = logger.With("src", src, "dst", dst)
 
 	password, err := os.ReadFile(passfile)
 	if err != nil {
@@ -78,17 +78,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = fn(target, name, password)
+	err = fn(src, dst, password)
 	if err != nil {
 		logger.Error("write fail", "error", err)
-		err = os.RemoveAll(name)
+		err = os.RemoveAll(dst)
 		if err == nil {
 			logger.Info("cleaned up junk file")
 		}
 		os.Exit(1)
 	}
 
-	err = os.RemoveAll(target)
+	err = os.RemoveAll(src)
 	if err != nil {
 		logger.Error("remove source", "error", err)
 	}
