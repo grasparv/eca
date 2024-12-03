@@ -47,11 +47,13 @@ func main() {
 		fn = encrypt
 		src = cmd.Directory
 		dst = strings.TrimSuffix(cmd.Directory, "/") + ".bin"
+		dst = filepath.Clean(dst)
 		passfile = cmd.Passfile
 	case *DecryptCmd:
 		fn = decrypt
 		src = cmd.File
 		dst = strings.TrimSuffix(filepath.Base(cmd.File), ".bin")
+		dst = filepath.Clean(dst)
 		passfile = cmd.Passfile
 	default:
 		os.Stderr.WriteString(xflag.GetUsage(commands))
@@ -60,7 +62,7 @@ func main() {
 
 	_, err = os.Stat(src)
 	if errors.Is(err, os.ErrNotExist) {
-		logger.Error("does not exist", "dst", src)
+		logger.Error("does not exist", "src", src)
 		os.Exit(1)
 	}
 
