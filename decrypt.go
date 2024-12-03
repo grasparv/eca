@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func decrypt(inputFile, dstDir, passphrase string) error {
+func decrypt(inputFile, dstDir string, passphrase []byte) error {
 	file, err := os.Open(inputFile)
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func decrypt(inputFile, dstDir, passphrase string) error {
 		return err
 	}
 
-	key := pbkdf2.Key([]byte(passphrase), salt, 4096, 32, sha256.New)
+	key := pbkdf2.Key(passphrase, salt, 4096, 32, sha256.New)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return err

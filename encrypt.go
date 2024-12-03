@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func encrypt(srcDir, outputFile, passphrase string) error {
+func encrypt(srcDir, outputFile string, passphrase []byte) error {
 	output, err := os.Create(outputFile)
 	if err != nil {
 		return err
